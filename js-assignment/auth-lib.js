@@ -1,87 +1,33 @@
-class User {
-    constructor(name, password, group = []) {
-        this.name = name;
-        this.password = password;
-        this.groups = group;
-        // this.authorized = authorized;
-    }
-
-    addGroupToUser(group) {
-        this.deletedGroup(group);
-
-        this.badArg(group);
-
-        this.groups.push(group);
-    }
-
-    removeUserFromGroup(group) {
-        this.deletedGroup(group);
-
-        this.badArg(group);
-
-        this.hasGroup(group);
-
-        this.groups.splice(this.groups.indexOf(group, 0), 1);
-
-    }
-
-    deletedGroup(group) {
-        if(allGroups.indexOf(group) === -1)
-            throw new Error("Deleted group");
-    }
-
-    hasGroup(group) {
-        if (this.groups.indexOf(group) === -1)
-            throw new Error("Group not found");
-    }
-
-    badArg(group) {
-        if (!group)
-            throw new Error("Not group");
-    }
-}
-
-class Group {
-    constructor(name, right = []) {
-        this.name = name;
-        this.rights = right;
-    }
-
-    addRight(right) {
-        if(!right)
-            throw new Error("no right");
-
-        if(allRights.indexOf(right) === -1)
-                throw new Error("Deleted right");
-
-        this.rights.push(right)
-    }
-
-    removeRight(right) {
-        if (!right)
-            throw new Error('not right'); //правльность аргумента
-
-        if (this.rights.indexOf(right, 0) === -1)
-            throw new Error('not found'); //наличие права у группы
-
-        if (allRights.indexOf(right) === -1) //проверка на передачу удаленного права
-            throw new Error("right not found");
-
-        this.rights.splice(this.rights.indexOf(right), 1)
-    }
-
-}
-
-class Right {
-    constructor(name) {
-        this.name = name;
-    }
-}
-
 const allUsers = [];
 const allGroups = [];
 const allRights = [];
 
+function isContainEntityArray(array, entity, message) {
+    if (array.indexOf(entity) === -1)
+        exception(message);
+}
+
+function isNotContainEntityArray(array, entity, message) {
+    if (array.indexOf(entity) !== -1)
+        exception(message);
+}
+
+function exception(message) {
+    throw new Error(message);
+}
+
+function spliceArray(array, index) {
+    array.splice(index, 1)
+}
+
+function notEntityOrEntityNotFound(entity, index, massage) {
+
+
+    if (!entity || index === -1) {
+        exception(massage);
+    }
+
+}
 // Возвращает массив всех пользователей.
 function users() {return allUsers}
 
@@ -89,27 +35,20 @@ function users() {return allUsers}
 function createUser(name, password) {
     const user = new User(name, password);
 
-    if (allUsers.indexOf(user) !== -1)
-        throw new Error('User is added');
+    isNotContainEntityArray(allUsers, user, 'User is added');
 
     allUsers.push(user);
 
-    return user
+    return user;
 }
 
 // Удаляет пользователя user
 function deleteUser(user) {
-    if (!user) {
-        throw new Error('User is undefined');
-    }
-
     const index = allUsers.indexOf(user);
 
-    if (index === -1) {
-        throw new Error('User not found');
-    }
+    notEntityOrEntityNotFound(user, index, "User is undefined or not found");
 
-    allUsers.splice(index, 1);
+    spliceArray(allUsers, index);
 }
 
 // Возвращает массив групп, к которым принадлежит пользователь user
@@ -119,22 +58,13 @@ function userGroups(user) {
 
 // Добавляет пользователя user в группу group
 function addUserToGroup(user, group) {
-
-    if (allUsers.indexOf(user) === -1) {
-        throw new Error('User not found');
-    }
-
+    isContainEntityArray(allUsers, user, 'User not found');
     user.addGroupToUser(group);
-
 }
 
 // Удаляет пользователя user из группы group. Должна бросить исключение, если пользователя user нет в группе group
 function removeUserFromGroup(user, group) {
-
-    if (allUsers.indexOf(user) === -1) {
-        throw new Error('User not found');
-    }
-
+    isContainEntityArray(allUsers, user, 'User not found');
     user.removeUserFromGroup(group);
 
 }
@@ -146,11 +76,9 @@ function rights() {
 
 // Создает новое право с именем name и возвращает его
 function createRight(name) {
-
     const right = new Right(name);
 
-    if (allRights.indexOf(right) !== -1)
-        throw new Error("Right is added");
+    isNotContainEntityArray(allRights, right, 'Right is added');
 
     allRights.push(right);
 
@@ -160,22 +88,15 @@ function createRight(name) {
 // Удаляет право right
 function deleteRight(right) {
 
-    if (allRights.indexOf(right) === -1) {
-        throw new Error('Right not found');
-    }
-
-    if (!right) {
-        throw new Error("Not right");
-    }
+    notEntityOrEntityNotFound(right, allRights.indexOf(right), "Not right or Right not found");
 
     for (let i = 0; i < allGroups.length; i++) {
-
-        allGroups[i].rights.splice(allGroups[i].rights.indexOf(right), 1);
+        const rights = allGroups[i].rights;
+        spliceArray(rights, rights.indexOf(right));
 
     }
 
-    allRights.splice(allRights.indexOf(right), 1);
-
+    spliceArray(allRights, allRights.indexOf(right));
 }
 
 // Возвращает массив групп
@@ -187,8 +108,7 @@ function groups() {
 function createGroup(name) {
     const group = new Group(name);
 
-    if (allGroups.indexOf(group) !== -1)
-        throw new Error("Group is added");
+    isNotContainEntityArray(allGroups, group, 'Group is added');
 
     allGroups.push(group);
 
@@ -198,29 +118,24 @@ function createGroup(name) {
 // Удаляет группу group
 function deleteGroup(group) {
 
-    if (allGroups.indexOf(group) === -1) {
-        throw new Error('Group not found');
-    }
-
-    if (!group) {
-        throw new Error("Not group");
-    }
+    notEntityOrEntityNotFound(group, allGroups.indexOf(group), "Not group or Group not found");
 
     for (let i = 0; i < allUsers.length; i++) {
 
-        allUsers[i].groups.splice(allUsers[i].groups.indexOf(group), 1);
+        const groups = allUsers[i].groups;
+
+        spliceArray(groups, groups.indexOf(group));
+
     }
 
-    allGroups.splice(allGroups.indexOf(group, 0), 1);
+    spliceArray(allGroups, allGroups.indexOf(group));
 
 }
 
 // Добавляет право right к группе group
 function addRightToGroup(right, group) {
 
-    if (allGroups.indexOf(group) === -1) {
-        throw new Error('Group not found');
-    }
+    isContainEntityArray(allGroups, group, 'Group not found');
 
     group.addRight(right);
 
@@ -229,9 +144,7 @@ function addRightToGroup(right, group) {
 // Удаляет право right из группы group. Должна бросить исключение, если права right нет в группе group
 function removeRightFromGroup(right, group) {
 
-    if (allGroups.indexOf(group) === -1) {
-        throw new Error('Group not found');
-    }
+    isContainEntityArray(allGroups, group, 'Group not found');
 
     group.removeRight(right);
 }
@@ -243,64 +156,48 @@ function groupRights(group) {
 
 }
 
-let sessions = [];
-
 function login(name, password) {
+    const user = allUsers.find(user => user.name === name && user.password === password);
 
-    // const user = createUser(name, password);
+    if (!user || user.authorized)
+       return false;
 
-    if (sessions.indexOf(createUser(name, password)) !== -1) //не авторизовываться 2й раз
-        return false;
+    user.authorized = true;
 
-    sessions.splice(0, 1, createUser(name, password)); //переписываем активную сессию
-
-    return true
+    return true;
 }
-
+//вернуть авторизованного пользователя
 function currentUser() {
 
-    return sessions[0];
+    for (let i = 0; i < allUsers.length; i++) {
+        if(allUsers[i].authorized) {
+            return allUsers[i];
+        }
+    }
 
-
-    // НЕ РАБОТАЕТ
-    // if (sessions !== createUser(name, password)){
-    //     console.log("not a curent user");
-    //      return undefined;
-    // }
-    //
-    // return createUser(name, password);
+    return undefined
 }
-
 
 function logout() {
-
-
-
-    // НЕ РАБОТАЕТ
-    // if(currentUser(name, password) === undefined)
-    //     throw new Error("cant logout, because is not current user");
-    //
-    sessions.splice(0, 1, undefined);
-
+    const user = currentUser();
+    if(user)
+        user.authorized = false
 
 }
-
-// Group= [admin, basic, work]
-//
-// users = [r2d2, cowboy, noob]
-//
-// right =
-
-
 
 function isAuthorized(user, right) {
 
+    if (!user || !right)
+        throw new Error('Not user or right');
 
+    if (allUsers.indexOf(user) === -1 || allRights.indexOf(right) === -1)
+        throw new Error('user or right was deleted');
 
-    // return group.users.indexOf(user) !== -1 && group.users.indexOf(right) !== -1;
+    for (let i = 0; i < user.groups.length; i++) {
+        if (user.groups[i].rights.indexOf(right) !== -1)
+            return true;
+    }
 
-
+    return false
 }
 
-// вывести массив групп пользователя, к которым он принадлежит
-//

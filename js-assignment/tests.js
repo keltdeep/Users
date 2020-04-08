@@ -314,6 +314,11 @@ describe("Авторизация:", function() {
 		var right = createRight();
 		expect(isAuthorized(user, right)).toBe(false);
 		addRightToGroup(right, group2);
+		console.log(userGroups(user))
+		console.log(user);
+		console.log(group2);
+		console.log(right);
+		console.log(isAuthorized(user, right));
 		expect(isAuthorized(user, right)).toBe(true);
 	});
 
