@@ -314,11 +314,6 @@ describe("Авторизация:", function() {
 		var right = createRight();
 		expect(isAuthorized(user, right)).toBe(false);
 		addRightToGroup(right, group2);
-		console.log(userGroups(user))
-		console.log(user);
-		console.log(group2);
-		console.log(right);
-		console.log(isAuthorized(user, right));
 		expect(isAuthorized(user, right)).toBe(true);
 	});
 
@@ -390,24 +385,30 @@ var actions = [
 	entities[1].create,
 	entities[2].create,
 	function() {
+
 		if (users().length == 0) return;
 		deleteUser(randomElement(users()));
 	},
+	//181
 	function() {
+
 		if (rights().length == 0) return;
 		deleteRight(randomElement(rights()));
 	},
 	function() {
+
 		if (groups().length == 0) return;
 		deleteGroup(randomElement(groups()));
 	},
 	function() {
+
 		if (groups().length == 0 || users().length == 0) return;
 		var user = randomElement(users());
 		var group = randomElement(groups());
 		addUserToGroup(user, group);
 	},
 	function() {
+		console.warn('5')
 		var usersWithGroups = users().filter(function(user) { return userGroups(user).length > 0; });
 		if (usersWithGroups.length > 0) {
 			var user = randomElement(usersWithGroups);
@@ -415,6 +416,7 @@ var actions = [
 		}
 	},
 	function() {
+
 		if (groups().length == 0 || rights().length == 0) return;
 		var right = randomElement(rights());
 		var group = randomElement(groups());
@@ -422,6 +424,7 @@ var actions = [
 	},
 	function() {
 		var groupsWithRights = groups().filter(function(group) { return groupRights(group).length > 0; });
+		console.warn(groupsWithRights)
 		if (groupsWithRights.length > 0) {
 			var group = randomElement(groupsWithRights);
 			removeRightFromGroup(randomElement(groupRights(group)), group);
